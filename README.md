@@ -141,10 +141,3 @@ Puis push + Pull Request.
 
 Projet développé dans le cadre d’un travail collaboratif académique.
 
-
-Je peux aussi adapter le README selon :
-👉 projet scolaire
-👉 projet open source
-👉 portfolio
-
-Lequel veux-tu ?
