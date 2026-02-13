@@ -4,7 +4,7 @@ require_once 'fonctions.php';
 
 // Sécurité : Seul le gestionnaire ou l'admin peut valider
 if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role'], ['Super Admin', 'Gestionnaire de stock'])) {
-    header("Location: login.php");
+    header("Location: connexion.php");
     exit();
 }
 
@@ -29,7 +29,7 @@ if (isset($_GET['action']) && isset($_GET['id'])) {
 // 2. Récupération des commandes en attente
 $sql = "SELECT f.*, u.nom, u.prenom 
         FROM factures f 
-        JOIN users u ON f.client_id = u.id 
+        JOIN users u ON f.user_id = u.id 
         WHERE f.statut = 'En attente de validation' 
         ORDER BY f.date_facture DESC";
 $commandes = $pdo->query($sql)->fetchAll();

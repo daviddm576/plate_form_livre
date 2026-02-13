@@ -197,6 +197,14 @@ if ($_SESSION['user']['role'] !== 'Super Admin') {
             <h3>📊 Analyse des Stocks et Ventes</h3>
             <p>Ce tableau compare le succès de vos livres face à l'inventaire actuel</p>
         </a>
+        <a href="rapports.php" class="card btn-view">
+            <h3>📊 rapports</h3>
+            <p>Rapports sur les articles les plus vendues</p>
+        </a>
+         <a href="rapport_journalier.php" class="card btn-view">
+            <h3>📊 rapport journalier</h3>
+            <p>Rapports sur les ventes selon le jour</p>
+        </a>
     </div>
 
     <div class="footer">

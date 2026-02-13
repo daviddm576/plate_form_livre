@@ -20,19 +20,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $prix = $_POST['prix'];
     $stock = $_POST['stock'];
     $cat_id = $_POST['categorie_id'];
-    
+
     // Gestion de l'image
     $image_name = "default_cover.jpg";
+
     if (!empty($_FILES['couverture']['name'])) {
         $target_dir = "couvertures/";
-        $image_name = time() . "_" . basename($_FILES['couverture']['name']);
-        $target_file = $target_dir . $image_name;
-        move_uploaded_file($_FILES['couverture']['tmp_name'], $target_file);
-    }
 
+        // Nettoyage du nom de fichier (on remplace les espaces par des underscores)
+        $clean_name = str_replace(' ', '_', $_FILES['couverture']['name']);
+        $image_name = time() . "_" . basename($clean_name);
+
+        $target_file = $target_dir . $image_name;
+
+        // CORRECTION ICI : 'couverture' au lieu de 'couvertures'
+        if (move_uploaded_file($_FILES['couverture']['tmp_name'], $target_file)) {
+            // Succès
+        } else {
+            // En cas d'échec, on garde l'image par défaut
+            $image_name = "default_cover.jpg";
+        }
+    }
     $sql = "INSERT INTO livres (titre, auteur, prix, stock, categorie_id, image_couverture) VALUES (?, ?, ?, ?, ?, ?)";
     $stmt = $pdo->prepare($sql);
-    
+
     if ($stmt->execute([$titre, $auteur, $prix, $stock, $cat_id, $image_name])) {
         $message = "<p style='color:green;'>Livre ajouté avec succès !</p>";
     } else {
@@ -43,19 +54,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <title>Ajouter un Livre - RACINE</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; padding-top: 90px; }
-        .form-container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        .btn-submit { background: #3498db; color: white; border: none; padding: 12px; width: 100%; border-radius: 5px; cursor: pointer; font-size: 1rem; }
-        .btn-submit:hover { background: #2980b9; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f4f7f6;
+            margin: 0;
+            padding-top: 90px;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn-submit {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-submit:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
+
 <body>
 
     <?php include 'bar_de_navigation.php'; ?>
@@ -99,4 +155,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
 </body>
+
 </html>

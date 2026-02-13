@@ -127,19 +127,21 @@ $userRole = $_SESSION['user']['role'] ?? '';
         <ul class="nav-menu">
             <?php if ($userRole === 'Super Admin') : ?>
                 <li><a href="admin.php" class="<?= $page == 'admin.php' ? 'active' : '' ?>">Panneau de control</a></li>
-                                <li><a href="tableau_de_bord.php" class="<?= $page == 'tableau_de_bord.php' ? 'active' : '' ?>">tableau de bord</a></li>
+                <li><a href="tableau_de_bord.php" class="<?= $page == 'tableau_de_bord.php' ? 'active' : '' ?>">tableau de bord</a></li>
                 <li><a href="voir_utilisateurs.php" class="<?= $page == 'voir_utilisateurs.php' ? 'active' : '' ?>">Utilisateurs</a></li>
+                <li><a href="creer_facture.php" class="<?= $page == 'creer_facture.php' ? 'active' : '' ?>">Créer Facture</a></li>
+                <li><a href="commande_en_attente.php" class="<?= $page == 'commande_en_attente.php' ? 'active' : '' ?>">Commandes en attente</a></li>
             <?php endif; ?>
 
             <?php if ($userRole === 'Super Admin' || $userRole === 'Gestionnaire de stock') : ?>
                 <li><a href="gestion_livres.php" class="<?= $page == 'gestion_livres.php' ? 'active' : '' ?>">Gestion Livres</a></li>
 
-               
+
             <?php endif; ?>
 
             <?php if ($userRole === 'Gestionnaire de stock') : ?>
                 <li><a href="creer_facture.php" class="<?= $page == 'creer_facture.php' ? 'active' : '' ?>">Créer Facture</a></li>
-                <li><a href="commandes_attente.php" class="<?= $page == 'commandes_attente.php' ? 'active' : '' ?>">Commandes en attente</a></li>
+                <li><a href="commande_en_attente.php" class="<?= $page == 'commande_en_attente.php' ? 'active' : '' ?>">Commandes en attente</a></li>
             <?php endif; ?>
         </ul>
     </div>

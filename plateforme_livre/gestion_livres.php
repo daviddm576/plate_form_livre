@@ -151,14 +151,17 @@ $livres = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
                             <small style="color: #7f8c8d;"><?= htmlspecialchars($livre['auteur']) ?></small>
                         </td>
                         <td><span class="badge"><?= htmlspecialchars($livre['nom_categorie'] ?? 'Sans catégorie') ?></span></td>
-                        <td><?= number_format($livre['prix'], 2) ?> €</td>
+                        <td><?= number_format($livre['prix'], 2) ?> Fc</td>
                         <td>
                             <span style="color: <?= $livre['stock'] > 0 ? '#27ae60' : '#e74c3c' ?>;">
                                 <?= $livre['stock'] ?> en stock
                             </span>
                         </td>
                         <td>
-                            <a href="#" style="text-decoration: none; color: #3498db;">Modifier</a>
+                            <a href="modifier_livre.php?id=<?= $l['id'] ?>" style="color: #3498db; text-decoration: none; margin-right: 10px;">📝 Modifier</a>
+
+                            <a href="gestion_livres.php?delete=<?= $u['id'] ?>" class="btn-delete" onclick="return confirm('Supprimer ce livre ?')">Supprimer</a>
+
                         </td>
                     </tr>
                 <?php endforeach; ?>

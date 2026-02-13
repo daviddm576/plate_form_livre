@@ -70,49 +70,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valider_facture'])) {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <meta charset="UTF-8">
-    <title>Créer Facture - RACINE</title>
+    <title>Facturation RACINE</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #f4f7f6;
-            padding-top: 90px;
+            padding-top: 50px;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .ligne-livre {
+        /* Design Style Facture */
+        .header-facture {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            align-items: center;
-            border-bottom: 1px solid #eee;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #2c3e50;
             padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background: #2c3e50;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-section {
+            float: right;
+            width: 300px;
+            margin-top: 20px;
+        }
+
+        .total-box {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            font-size: 1.4rem;
+            text-align: center;
+            border-radius: 5px;
         }
 
         .btn-add {
             background: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: 4px;
             cursor: pointer;
-            margin-bottom: 20px;
-        }
-
-        .btn-remove {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px;
-            border-radius: 5px;
-            cursor: pointer;
+            font-weight: bold;
         }
 
         .btn-submit {
@@ -121,21 +145,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valider_facture'])) {
             border: none;
             padding: 15px;
             width: 100%;
-            border-radius: 8px;
-            font-weight: bold;
+            border-radius: 5px;
+            font-size: 1.1rem;
             cursor: pointer;
+            margin-top: 20px;
         }
 
-        input,
-        select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
         }
 
         .alert {
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 5px;
             margin-bottom: 20px;
         }
 
@@ -152,68 +179,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valider_facture'])) {
 </head>
 
 <body>
+
     <?php include 'bar_de_navigation.php'; ?>
 
     <div class="container">
-        <h2>🧾 Nouvelle Vente Multi-articles</h2>
+        <div class="header-facture">
+            <div>
+                <h2>🧾 FACTURATION</h2>
+            </div>
+            <div><strong>Date:</strong> <?= date('d/m/Y') ?></div>
+        </div>
+
         <?= $message ?>
 
         <form method="POST" id="factureForm">
-            <div style="margin-bottom: 20px;">
-                <label><strong>Nom du Client :</strong></label><br>
-                <input type="text" name="client_nom" required style="width: 100%; margin-top: 5px;">
+            <div style="margin-bottom: 30px;">
+                <label><strong>Nom du Client / Bénéficiaire :</strong></label>
+                <input type="text" name="client_nom" required placeholder="Ex: Jean Mukendi" style="width: 100%; padding: 10px; margin-top: 5px;">
             </div>
 
-            <div id="liste-livres">
-                <label><strong>Sélection des livres :</strong></label>
-                <div class="ligne-livre">
-                    <select name="livre_id[]" required style="flex: 3;">
-                        <option value="">Choisir un livre...</option>
-                        <?php foreach ($all_books as $lb): ?>
-                            <option value="<?= $lb['id'] ?>"><?= htmlspecialchars($lb['titre']) ?> (<?= $lb['prix'] ?>€)</option>
-                        <?php endforeach; ?>
-                    </select>
-                    <input type="number" name="quantite[]" value="1" min="1" style="flex: 1;" placeholder="Qté">
-                    <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
-                </div>
+            <table id="table-articles">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Livre</th>
+                        <th>Prix (FC)</th>
+                        <th>Qté</th>
+                        <th>Total (FC)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="corps-facture">
+                </tbody>
+            </table>
+
+            <button type="button" class="btn-add" onclick="ajouterLigne()">+ Ajouter un article</button>
+
+            <div class="total-section">
+                <div style="margin-bottom: 10px; font-weight: bold;">TOTAL GÉNÉRAL</div>
+                <div class="total-box" id="grand-total">0 FC</div>
             </div>
 
-            <button type="button" class="btn-add" onclick="ajouterLigne()">+ Ajouter un autre livre</button>
-
-            <div style="margin-top: 20px; border-top: 2px solid #eee; pt: 20px;">
-                <button type="submit" name="valider_facture" class="btn-submit">Valider et enregistrer la vente</button>
-            </div>
+            <div style="clear: both;"></div>
+            <button type="submit" name="valider_facture" class="btn-submit">✅ VALIDER ET IMPRIMER LA VENTE</button>
         </form>
     </div>
 
     <script>
+        // Liste des livres formatée pour JS
+        const livresData = <?= json_encode($all_books) ?>;
+
         $(document).ready(function() {
-            // Initialise le premier select
-            $('.select-livre').select2();
+            ajouterLigne(); // On ajoute une ligne vide au départ
         });
 
         function ajouterLigne() {
-            const conteneur = document.getElementById('liste-livres');
-            const nouvelleLigne = document.createElement('div');
-            nouvelleLigne.className = 'ligne-livre';
+            const idUnique = Date.now();
+            let options = '<option value="">Choisir un livre...</option>';
+            livresData.forEach(l => {
+                options += `<option value="${l.id}" data-prix="${l.prix}">${l.titre}</option>`;
+            });
 
-            // Ajoute la classe 'select-livre' au nouveau select
-            nouvelleLigne.innerHTML = `
-        <select name="livre_id[]" class="select-livre" required style="flex: 3;">
-            <option value="">Choisir un livre...</option>
-            <?php foreach ($all_books as $lb): ?>
-                <option value="<?= $lb['id'] ?>"><?= htmlspecialchars($lb['titre']) ?> (<?= $lb['prix'] ?>€)</option>
-            <?php endforeach; ?>
-        </select>
-        <input type="number" name="quantite[]" value="1" min="1" style="flex: 1;">
-        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
-    `;
-            conteneur.appendChild(nouvelleLigne);
+            const ligneHTML = `
+            <tr class="ligne-livre">
+                <td>
+                    <select name="livre_id[]" class="select-livre" required style="width:100%" onchange="calculerLigne(this)">
+                        ${options}
+                    </select>
+                </td>
+                <td><input type="text" class="prix-unit" readonly style="width:80px; border:none; background:transparent;"></td>
+                <td><input type="number" name="quantite[]" value="1" min="1" class="input-qte" style="width:60px;" oninput="calculerLigne(this)"></td>
+                <td class="total-ligne">0</td>
+                <td><button type="button" class="btn-remove" onclick="supprimerLigne(this)">✕</button></td>
+            </tr>
+        `;
 
-            // ACTIVE LA RECHERCHE SUR LE NOUVEAU SELECT
-            $(nouvelleLigne).find('.select-livre').select2();
+            $('#corps-facture').append(ligneHTML);
+            $('.select-livre').select2();
+        }
+
+        function calculerLigne(element) {
+            const ligne = $(element).closest('tr');
+            const prix = ligne.find('.select-livre option:selected').data('prix') || 0;
+            const qte = ligne.find('.input-qte').val() || 0;
+
+            const total = prix * qte;
+
+            ligne.find('.prix-unit').val(prix);
+            ligne.find('.total-ligne').text(total.toLocaleString('fr-FR'));
+
+            calculerGrandTotal();
+        }
+
+        function calculerGrandTotal() {
+            let grandTotal = 0;
+            $('.ligne-livre').each(function() {
+                const prix = $(this).find('.select-livre option:selected').data('prix') || 0;
+                const qte = $(this).find('.input-qte').val() || 0;
+                grandTotal += (prix * qte);
+            });
+
+            $('#grand-total').text(grandTotal.toLocaleString('fr-FR') + ' FC');
+        }
+
+        function supprimerLigne(btn) {
+            $(btn).closest('tr').remove();
+            calculerGrandTotal();
         }
     </script>
+
 </body>
 
 </html>

@@ -29,7 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: gestion_livres.php");
         } else {
             // Rôle par défaut si tu as des clients/visiteurs
-            header("Location: catalogue_livres.php");
+            header("Location: catalogue.php");
         }
         exit();
     } else {
